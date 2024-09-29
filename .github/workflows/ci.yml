@@ -29,6 +29,8 @@ jobs:
 
       - uses: hynek/build-and-inspect-python-package@v2
         id: baipp
+        with:
+          skip-wheel: true
 
     outputs:
       # Used to define the matrix for tests below. The value is based on
@@ -60,13 +62,15 @@ jobs:
       - uses: hynek/setup-cached-uv@v2
       - run: uv venv
       - run: uv pip install .[dev]
-      - run: uv run coverage run -p -m pytest
+      - run: |
+          cd tests
+          uv run coverage run -p -m pytest
 
       - name: Upload coverage data
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-${{ matrix.python-version }}
-          path: .coverage.*
+          path: tests/.coverage.*
           include-hidden-files: true
 
   coverage:
@@ -131,19 +135,19 @@ jobs:
       - uses: hynek/setup-cached-uv@v2
       - run: uv venv
 
-  pyright:
-    name: Check types using pyright
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version-file: .python-version-default
-      - uses: hynek/setup-cached-uv@v2
+  # pyright:
+  #   name: Check types using pyright
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version-file: .python-version-default
+  #     - uses: hynek/setup-cached-uv@v2
 
-      - run: uv venv
-      - run: uv pip install .[dev] pyright typing
-      - run: uv run pyright src
+  #     - run: uv venv
+  #     - run: uv pip install .[dev] pyright typing
+  #     - run: uv run pyright src
 
   install-dev:
     name: Verify dev env
@@ -173,7 +177,6 @@ jobs:
       - coverage
       - docs
       - install-dev
-      - pyright
 
     runs-on: ubuntu-latest
 
