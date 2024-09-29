@@ -43,3 +43,6 @@ build-backend = "hatchling.build"
 addopts = [
     "--import-mode=importlib",
 ]
+norecursedirs = [
+    "tests/helpers",
+]
